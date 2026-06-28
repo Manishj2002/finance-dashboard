@@ -1,0 +1,39 @@
+finance-dashboard/
+├── client/                  # Frontend (Next.js + TypeScript)
+│   ├── components/          # Reusable UI components
+│   ├── pages/               # Route-based pages
+│   ├── hooks/               # Custom React hooks
+│   ├── services/            # API call functions
+│   ├── stores/              # State management
+│   └── styles/              # Tailwind config, globals
+├── server/                  # Backend (Node.js + Express)
+│   ├── controllers/         # Route handlers
+│   ├── models/              # Database models (Prisma)
+│   ├── routes/              # API route definitions
+│   ├── middleware/           # Auth, error handling
+│   └── services/            # Business logic, Plaid integration
+├── prisma/                  # Prisma schema & migrations
+├── docker-compose.yml
+└── README.md
+
+
+
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

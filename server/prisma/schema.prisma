@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  firstName     String
+  lastName      String
+  currency      String         @default("USD")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  accounts      Account[]
+  categories    Category[]
+  transactions  Transaction[]
+  budgets       Budget[]
+  goals         Goal[]
+  investments   Investment[]
+  debts         Debt[]
+}
+
+model Account {
+  id           String         @id @default(uuid())
+  userId       String
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  type         AccountType
+  balance      Float          @default(0)
+  institution  String?
+  color        String         @default("#4F46E5")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  CREDIT_CARD
+  CASH
+  INVESTMENT
+}
+
+model Category {
+  id           String         @id @default(uuid())
+  userId       String
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  type         TransactionType
+  icon         String         @default("📦")
+  color        String         @default("#6B7280")
+  createdAt    DateTime       @default(now())
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId   String
+  account     Account         @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  categoryId  String
+  category    Category        @relation(fields: [categoryId], references: [id])
+  type        TransactionType
+  amount      Float
+  description String
+  date        DateTime
+  notes       String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([accountId])
+  @@index([categoryId])
+  @@index([date])
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+model Budget {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  amount      Float
+  month       Int
+  year        Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, categoryId, month, year])
+  @@index([userId])
+}
+
+model Goal {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  targetAmount  Float
+  currentAmount Float    @default(0)
+  deadline      DateTime?
+  icon          String   @default("🎯")
+  color         String   @default("#10B981")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Investment {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  ticker        String?
+  type          InvestmentType
+  quantity      Float
+  avgCost       Float
+  currentPrice  Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+}
+
+enum InvestmentType {
+  STOCK
+  MUTUAL_FUND
+  ETF
+  CRYPTO
+  BOND
+  OTHER
+}
+
+model Debt {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  type           DebtType
+  balance        Float
+  interestRate   Float
+  minimumPayment Float
+  dueDate        Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+}
+
+enum DebtType {
+  CREDIT_CARD
+  STUDENT_LOAN
+  MORTGAGE
+  AUTO_LOAN
+  PERSONAL_LOAN
+  OTHER
+}
